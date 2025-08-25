@@ -1,103 +1,159 @@
-import Image from "next/image";
+'use client';
+import {SupervisedChart} from './supervisedChart'; 
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <main className="flex flex-col items-center justify-center">
+      
+      <SupervisedML/>
+    </main>
+  );
+}
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+export function SupervisedML() {
+  return (
+    <div className="flex flex-row w-full min-h-screen px-6 py-8 gap-10">
+      {/*Text Box */}
+      <div className="w-1/2 bg-gray-900 text-white p-6 rounded-lg shadow-lg">
+        <h2 className="text-2x1 font-bold mb-4">Supervised ML</h2>
+        <p>Models that use Supervised Learning takes in example cases of both inputs and outputs. These models then predict the output when a new input is given.
+          Popular use cases are Classification, Regression, and the foundation of all modern machine learning concepts today: Neural Networks.
+        </p>
+      </div>
+
+      {/* Graph */}
+      <div className="w-1/2 bg-black rounded-lg overflow-hidden">
+        <SupervisedChart/>
+      </div>
     </div>
+  );
+}
+
+export function NerualDemo() {
+  const layers = [
+    { size: 3 },
+    { size: 5 },
+    { size: 4 },
+    { size: 2 },
+  ];
+
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  const layerSpacing = width / (layers.length + 1);
+  const neuronRadius = 50;
+  const neuronColumnSpace = 30;
+
+  return (
+    
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      className="w-full h-auto bg-black rounded-lg"
+      preserveAspectRatio="xMidYMid meet"
+    >
+  
+      {/* Connections */}
+      {layers.slice(0, -1).map((fromLayer, i) => {
+        const toLayer = layers[i + 1];
+
+        const fromX = (i + 1) * layerSpacing + neuronRadius + neuronColumnSpace;
+        const toX = (i + 2) * layerSpacing - neuronRadius - neuronColumnSpace;
+
+        const fromYSpacing = height / (fromLayer.size + 1);
+        const toYSpacing = height / (toLayer.size + 1);
+
+        const fromCenterY = ((fromLayer.size + 1) / 2) * fromYSpacing;
+        const toCenterY = ((toLayer.size + 1) / 2)* toYSpacing;
+
+        
+        return (
+          <g key={`center-${i}`}>
+          <line
+            x1={fromX}
+            y1={fromCenterY}
+            x2={toX}
+            y2={toCenterY}
+            stroke="#ffffffff"
+            strokeWidth={10}
+          />
+
+          <circle r={6} fill="red">
+            <animate
+              attributeName="cx"
+              values={`${fromX}; ${toX}`}
+              dur="2s"
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="cy"
+              values={`${fromCenterY}; ${toCenterY}`}
+              dur="2s"
+              repeatCount="indefinite"
+            />
+          </circle>
+        </g>
+      );
+
+        
+      })}
+
+      {/*Line animation*/}
+
+      {/* Neurons */}
+      {layers.map((layer, layerIndex) => {
+        const x = (layerIndex + 1) * layerSpacing;
+        const ySpacing = height / (layer.size + 1);
+
+        // Compute top and bottom Y of neurons
+        const topY = ySpacing - neuronRadius - 10;
+        const bottomY = layer.size * ySpacing + neuronRadius + 10;
+
+        return (
+          <g key={layerIndex}>
+            {/* ⬛ Column border around neurons */}
+            <rect
+              x={x - neuronRadius - neuronColumnSpace}
+              y={topY}
+              width={neuronRadius * 2 + 60}
+              height={bottomY - topY}
+              rx={20}
+              fill="none"
+              stroke="#888"
+              strokeDasharray=""
+            />
+            <text
+              x={(layerIndex + 1) * layerSpacing}
+              y={40}
+              textAnchor="middle"
+              fill="white"
+              fontSize="16"
+              fontFamily="sans-serif"
+            >
+              {layerIndex === 0
+                ? "Input"
+                : layerIndex === layers.length - 1
+                ? "Output"
+                : `Hidden ${layerIndex}`}
+            </text>
+
+            {/* 🔵 Neurons */}
+            {Array.from({ length: layer.size }).map((_, neuronIndex) => {
+              const cy = (neuronIndex + 1) * ySpacing;
+              return (
+                <circle
+                  key={neuronIndex}
+                  cx={x}
+                  cy={cy}
+                  r={neuronRadius}
+                  fill="#ffffffff"
+                  stroke="black"
+                />
+              );
+            })}
+          </g>
+        );
+
+        
+      })}
+    </svg>
   );
 }
