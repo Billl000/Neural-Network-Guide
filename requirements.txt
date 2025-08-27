@@ -1,0 +1,5 @@
+react
+react-chartjs-2
+chart.js
+ml-matrix
+ml-regression-simple-linear
