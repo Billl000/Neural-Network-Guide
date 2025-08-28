@@ -72,21 +72,22 @@ export function SupervisedChart() {
 
   const data = {
     datasets: [
-      {
-        label: 'Accuracy',
+       {
+        label: 'Data Points',
         data: dataPoints,
         borderColor: 'rgba(255, 255, 255, 1)',
+        backgroundColor: 'white',
         tension: 0.4,
         pointBackgroundColor: 'white',
         pointRadius: 5,
         showLine: false,
-      },
+      }, 
       {
         label: 'New Data',
         data: rawPoints,
         borderColor: 'transparent',
         backgroundColor: 'red',
-        pointRadius: 4,
+        pointRadius: 5,
         showLine: false,
       },
       {
