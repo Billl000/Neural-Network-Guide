@@ -1,9 +1,8 @@
 import 'katex/dist/katex.min.css';
-import {BlockMath} from 'react-katex';
+import {BlockMath, InlineMath} from 'react-katex';
 import {SupervisedChart} from './supervisedChart'
 
 export function SupervisedML() {
-  var Latex = require('react-latex');
   return (
     <div className="flex flex-row lg:flex-row w-full min-h-screen px-6 py-8 gap-10">
       {/*Text Box */}
@@ -33,7 +32,7 @@ export function SupervisedML() {
         <BlockMath math="J(w, b) = \frac{1}{2m} \sum^{m}_{i=1} {(\hat{y}^{(i)} - y^{(i)})^2} = \frac{1}{2m} \sum^{m}_{i=1} {{(wx^{(i)} + b)} - y^{(i)})^2}" />
 
         <p className='mt-3'>
-          The formula above is one of the simple Square Cost Function. In the formula, <BlockMath math='\hat{y}^{(i)} = wx^{(i)} + b'/> represent the predicted y value when an x value input is given.
+          The formula above is one of the simple Square Cost Function. In the formula, <InlineMath math='\hat{y}^{(i)} = wx^{(i)} + b'/> represent the predicted y value when an x value input is given.
           We can alter the values of w and b to change the values of J(w, b), and try to minimize it.
         </p>
 

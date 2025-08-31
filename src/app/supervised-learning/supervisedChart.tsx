@@ -18,6 +18,11 @@ import {SimpleLinearRegression} from 'ml-regression-simple-linear';
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
 export function SupervisedChart() {
+  const [mode, setMode] = useState<'auto' | 'manual'>('manual'); //Setup dropdown box
+  const [cost, setCost] = useState<number | null>(0);
+  const wRef = useRef<HTMLInputElement>(null);
+  const bRef = useRef<HTMLInputElement>(null);
+
   const chartRef = useRef<any>(null);
 
   const [rawPoints, setRawPoints] = useState<{ x: number; y: number }[]>([]);
@@ -68,6 +73,42 @@ export function SupervisedChart() {
     setDataPoints([]);
     setRawPoints([]);
     setRegressionPoints([]);
+  }
+
+  const generateLine = (event:React.FormEvent) => {
+    event.preventDefault();
+
+    const combined = [...dataPoints, ...rawPoints];
+    const sorted = combined.sort((a, b) => a.x - b.x);
+    setDataPoints(sorted);
+    setRawPoints([]);
+
+    //Generate lstsq line
+    const x = combined.map(p => p.x);
+    const y = combined.map(p => p.y);
+    const regression = new SimpleLinearRegression(x, y);
+
+    const minX = Math.min(...x);
+    const maxX = Math.max(...x);
+
+    const w_input = parseFloat(wRef.current?.value || "0")
+    const b_input = parseFloat(bRef.current?.value || "0")
+
+
+    const regressionLine = [
+      {x: minX, y:  w_input * minX + b_input},
+      {x: maxX, y: w_input * maxX + b_input}
+    ];
+
+    const m = x.length;
+    let temp_cost = 0
+    for (let i = 0; i < m; i++) {
+      temp_cost += (w_input * x[i] + b_input - y[i])**2;
+    }
+    const newCost = 1/(2 * m) * temp_cost;
+    setCost(newCost);
+
+    setRegressionPoints(regressionLine);
   }
 
   const data = {
@@ -145,22 +186,65 @@ export function SupervisedChart() {
         ref={chartRef}
         data={data}
         options={options}
-        onClick={handleClick} // Moved here from inside options
+        onClick={handleClick} 
       />
 
-      <button
-        onClick={updateGraph}
-        className="mt-4 px-4 py-2 bg-white text-black rounded hover:bg-gray-200"
+      <select //Dropdown box
+        value={mode}
+        onChange={(e) => setMode(e.target.value as 'auto' | 'manual')}
+        className="mb-4 p-2 rounded"
       >
-        Update Graph
-      </button>
+        <option value="auto">Auto Best Fit</option>
+        <option value="manual"> Manual Input</option>
+      </select>
 
-      <button
-        onClick={resetGraph}
-        className="mt-4 mx-2 px-4 py-2 bg-white text-black rounded hover:bg-gray-200"
-      >
-        Reset Graph
-      </button>
+      {mode === 'auto' && ( //python switch equivalent
+        <>
+          <button
+          onClick={updateGraph}
+          className="mt-4 px-4 py-2 bg-white text-black rounded hover:bg-gray-200"
+          >
+            Update Graph
+          </button>
+
+          <button
+            onClick={resetGraph}
+            className="mt-4 mx-2 px-4 py-2 bg-white text-black rounded hover:bg-gray-200"
+          >
+            Reset Graph
+          </button>
+        </>
+      )}
+
+      {mode === 'manual' && (
+        <>
+          <form onSubmit={generateLine}>
+            <div className='flex flex-row items-center'>
+              <label>w Value: </label>
+              <input ref={wRef} className="mx-10" id="w_input" type="number" placeholder="Input w value" />
+              
+              <label>b Value: </label>
+              <input ref={bRef} className="mx-10" id="b_input" type="number" placeholder="Input b value" />
+
+              <button 
+                onClick={generateLine}
+                id='genLine'
+                className="mt-4 mx-2 px-4 py-2 bg-white text-black rounded hover:bg-gray-200"
+              >Generate Line</button>
+
+              
+            </div>
+
+            <p>Cost: {cost}</p>
+          </form>
+          <button 
+              onClick={generateLine}
+              className="mt-4 mx-2 px-4 py-2 bg-white text-black rounded hover:bg-gray-200"
+            >Perform Gradient Descent</button>
+        </>
+      )}
+
+      
     </div>
   );
 }
