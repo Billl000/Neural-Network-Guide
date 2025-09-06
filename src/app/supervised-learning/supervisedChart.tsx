@@ -23,6 +23,11 @@ export function SupervisedChart() {
   const wRef = useRef<HTMLInputElement>(null);
   const bRef = useRef<HTMLInputElement>(null);
 
+  const [wAnim, setWAnim] = useState(0);
+  const [bAnim, setBAnim] = useState(0);
+  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+
+
   const chartRef = useRef<any>(null);
 
   const [rawPoints, setRawPoints] = useState<{ x: number; y: number }[]>([]);
@@ -111,6 +116,59 @@ export function SupervisedChart() {
     setRegressionPoints(regressionLine);
   }
 
+  function animateGradientDescent() {
+    const combined = [...dataPoints, ...rawPoints];
+    const x = combined.map(p => p.x);
+    const y = combined.map(p => p.y);
+    const m = x.length;
+
+    let w = parseFloat(wRef.current?.value || "0");
+    let b = parseFloat(bRef.current?.value || "0");
+
+    const learningRate = 0.05;
+    const maxIterations = 500;
+    const tolerance = 1e-5;
+
+    let iteration = 0;
+
+    const id = setInterval(() => {
+
+      const currentCost = calculateCost(w, b, x, y);
+      if (iteration >= maxIterations || currentCost < tolerance) {
+        clearInterval(id);
+        setIntervalId(null);
+        return;
+      }
+
+      let dw = 0, db = 0;
+      for (let i = 0; i < m; i++) {
+        const error = w * x[i] + b - y[i];
+        dw += error * x[i];
+        db += error;
+      }
+      dw /= m;
+      db /= m;
+
+      w = w - learningRate * dw;
+      b = b - learningRate * db;
+
+      const minX = Math.min(...x);
+      const maxX = Math.max(...x);
+      const regressionLine = [
+        { x: minX, y: w * minX + b },
+        { x: maxX, y: w * maxX + b },
+      ];
+
+      setRegressionPoints(regressionLine);
+      setCost(currentCost);
+      setWAnim(w);
+      setBAnim(b);
+
+      iteration++;
+    }, 5);
+
+    setIntervalId(id);
+  }
   const data = {
     datasets: [
        {
@@ -238,7 +296,7 @@ export function SupervisedChart() {
             <p>Cost: {cost}</p>
           </form>
           <button 
-              onClick={generateLine}
+              onClick={animateGradientDescent}
               className="mt-4 mx-2 px-4 py-2 bg-white text-black rounded hover:bg-gray-200"
             >Perform Gradient Descent</button>
         </>
@@ -268,3 +326,15 @@ function LinearRegression(x: number[], y: number[]) {
 
   return (x: any) => intercept + slope * x;
 } */
+function calculateCost(w: number, b: number, x: number[], y: number[]) {
+  const m = x.length;
+  let totalError = 0;
+
+  for (let i = 0; i < m; i++) {
+    const error = w * x[i] + b - y[i];
+    totalError += error * error;
+  }
+
+  return totalError / (2 * m);
+}
+
